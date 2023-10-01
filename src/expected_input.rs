@@ -107,13 +107,15 @@ impl ExpectedInputInterface for ExpectedInput {
 #[cfg(test)]
 mod tests {
     use std::{io::Write, time::Duration};
+    use rand::{thread_rng, Rng}; // Add this import
 
     use super::*;
+    use super::super::*; // Add this import
 
     #[test]
     fn new_expected_input_should_correctly_convert_to_str() {
         let config = Config::default();
-        let expected_input = ExpectedInput::new(&config).expect("unable to create expected input");
+        let expected_input = ExpectedInput::new(&config).expect("Unable to create expected input");
 
         assert_eq!(expected_input.get_string(12).len(), 12);
     }
@@ -122,7 +124,7 @@ mod tests {
     fn should_read_file() {
         let mut config_file = tempfile::NamedTempFile::new().expect("Unable to create temp file");
         config_file
-            .write_all(r#"halo"#.as_bytes())
+            .write_all(b"halo")
             .expect("Unable to write to temp file");
         let config = Config {
             duration: Duration::from_secs(30),
@@ -130,7 +132,7 @@ mod tests {
             dictionary_path: config_file.path().to_path_buf(),
         };
 
-        let expected_input = ExpectedInput::new(&config).expect("unable to create expected input");
+        let expected_input = ExpectedInput::new(&config).expect("Unable to create expected input");
 
         assert_eq!(expected_input.get_string(4), "halo");
     }
@@ -165,7 +167,7 @@ mod tests {
             "item7".to_string(),
             "item8".to_string(),
         ];
-        let mut rng = thread_rng();
+        let mut rng = thread_rng(); // Initialize RNG
         let numbers_ratio = 0.5;
 
         replace_words_with_numbers(&mut string_vec, &mut rng, numbers_ratio);
@@ -175,8 +177,8 @@ mod tests {
             .filter(|item| item.chars().all(|c| c.is_digit(10)))
             .collect();
 
-        let change_to_num_treshold = (numbers_ratio * string_vec.len() as f64).round() as usize;
-        assert_eq!(change_to_num_treshold, 4);
+        let change_to_num_threshold = (numbers_ratio * string_vec.len() as f64).round() as usize;
+        assert_eq!(change_to_num_threshold, 4);
         assert_eq!(
             items_with_only_digits.len(),
             4,
@@ -184,3 +186,4 @@ mod tests {
         );
     }
 }
+
